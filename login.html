@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <img src="logo-unhas.png" alt="Logo Unhas">
+  <h2>Login Admin</h2>
+</header>
+
+<div class="container">
+  <form onsubmit="login(event)">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+  <p id="msg" style="color:red;"></p>
+</div>
+
+<script>
+  function login(e){
+    e.preventDefault();
+    let u = document.getElementById("username").value;
+    let p = document.getElementById("password").value;
+
+    if(u === "admin" && p === "rahasia"){
+      localStorage.setItem("admin", "true");
+      window.location.href = "admin.html";
+    } else {
+      document.getElementById("msg").innerText = "Username / password salah!";
+    }
+  }
+</script>
+</body>
+</html>

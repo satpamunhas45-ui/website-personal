@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pengaduan Online Satpam Unhas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <img src="logo-unhas.png" alt="Logo Unhas" style="height:60px;">
+  <h2>Pengaduan Online Satpam Universitas Hasanuddin</h2>
+</header>
+
+<div class="container" id="halamanPelapor">
+  <h3>Form Pengaduan</h3>
+  <form onsubmit="kirimLaporan(event)">
+    <input type="text" id="nama" placeholder="Nama Lengkap" required>
+    <input type="text" id="alamat" placeholder="Alamat" required>
+    <input type="text" id="pekerjaan" placeholder="Pekerjaan" required>
+    <input type="text" id="nik" placeholder="NIK / NIM" required>
+    <textarea id="isi" placeholder="Isi Pengaduan" required></textarea>
+    <button type="submit">Kirim</button>
+  </form>
+
+  <h3>Dasbor Pelapor</h3>
+  <div id="daftarPelapor">Belum ada laporan</div>
+</div>
+
+<hr>
+
+<div class="container" id="halamanLogin">
+  <h3>Login Admin</h3>
+  <form onsubmit="loginAdmin(event)">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<div class="container" id="halamanAdmin" style="display:none;">
+  <h3>Dashboard Admin</h3>
+  <div id="daftarAdmin"></div>
+  <button onclick="logoutAdmin()">Logout</button>
+</div>
+
+<script>
+  // Fungsi kirim laporan
+  function kirimLaporan(e){
+    e.preventDefault();
+    let data = JSON.parse(localStorage.getItem("laporan")) || [];
+    let laporan = {
+      nama: document.getElementById("nama").value,
+      alamat: document.getElementById("alamat").value,
+      pekerjaan: document.getElementById("pekerjaan").value,
+      nik: document.getElementById("nik").value,
+      isi: document.getElementById("isi").value,
+      status: "Terkirim",
+      tanggal: new Date().toLocaleString()
+    };
+    data.push(laporan);
+    localStorage.setItem("laporan", JSON.stringify(data));
+    alert("Laporan berhasil dikirim!");
+    document.querySelector("form").reset();
+    tampilPelapor();
+  }
+
+  // Tampilkan laporan di dasbor pelapor
+  function tampilPelapor(){
+    let data = JSON.parse(localStorage.getItem("laporan")) || [];
+    let html = "";
+    if(data.length === 0){
+      html = "Belum ada laporan";
+    } else {
+      data.forEach((laporan, i) => {
+        html += `
+          <div class="card">
+            <b>Laporan #${i+1}</b><br>
+            Isi: ${laporan.isi}<br>
+            Status: <span style="color:${laporan.status==='Selesai'?'green':laporan.status==='Diproses'?'blue':'orange'}">${laporan.status}</span><br>
+            <small><i>${laporan.tanggal}</i></small>
+          </div>
+        `;
+      });
+    }
+    document.getElementById("daftarPelapor").innerHTML = html;
+  }
+
+  // Login Admin
+  function loginAdmin(e){
+    e.preventDefault();
+    let user = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
+    if(user === "admin" && pass === "satpam123"){
+      document.getElementById("halamanAdmin").style.display = "block";
+      document.getElementById("halamanPelapor").style.display = "none";
+      document.getElementById("halamanLogin").style.display = "none";
+      tampilAdmin();
+    } else {
+      alert("Username atau password salah!");
+    }
+  }
+
+  // Logout Admin
+  function logoutAdmin(){
+    document.getElementById("halamanAdmin").style.display = "none";
+    document.getElementById("halamanPelapor").style.display = "block";
+    document.getElementById("halamanLogin").style.display = "block";
+  }
+
+  // Tampilkan laporan di dashboard admin
+  function tampilAdmin(){
+    let data = JSON.parse(localStorage.getItem("laporan")) || [];
+    let html = "";
+    if(data.length === 0){
+      html = "Belum ada laporan";
+    } else {
+      data.forEach((laporan, i) => {
+        html += `
+          <div class="card">
+            <b>Laporan #${i+1}</b><br>
+            <b>Nama:</b> ${laporan.nama}<br>
+            <b>Alamat:</b> ${laporan.alamat}<br>
+            <b>Pekerjaan:</b> ${laporan.pekerjaan}<br>
+            <b>NIK/NIM:</b> ${laporan.nik}<br>
+            <b>Isi:</b> ${laporan.isi}<br>
+            <b>Status:</b> ${laporan.status}<br>
+            <small><i>${laporan.tanggal}</i></small><br><br>
+            <button onclick="ubahStatus(${i}, 'Diproses')">Diproses</button>
+            <button onclick="ubahStatus(${i}, 'Selesai')">Selesai</button>
+            <button onclick="hapusLaporan(${i})" style="background:red;color:white">Hapus</button>
+          </div>
+        `;
+      });
+    }
+    document.getElementById("daftarAdmin").innerHTML = html;
+  }
+
+  function ubahStatus(index, status){
+    let data = JSON.parse(localStorage.getItem("laporan")) || [];
+    data[index].status = status;
+    localStorage.setItem("laporan", JSON.stringify(data));
+    tampilAdmin();
+  }
+
+  function hapusLaporan(index){
+    let data = JSON.parse(localStorage.getItem("laporan")) || [];
+    if(confirm("Yakin ingin menghapus laporan ini?")){
+      data.splice(index,1);
+      localStorage.setItem("laporan", JSON.stringify(data));
+      tampilAdmin();
+    }
+  }
+
+  tampilPelapor();
+</script>
+
+</body>
+</html>

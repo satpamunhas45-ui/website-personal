@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Pengaduan Satpam Unhas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <img src="logo-unhas.png" alt="Logo Unhas">
+  <h2>Dashboard Admin - Satpam Unhas</h2>
+</header>
+
+<div class="container">
+  <h3>Daftar Laporan</h3>
+  <div id="daftarLaporan">Belum ada laporan</div>
+</div>
+
+<script>
+  function tampilkanLaporan(){
+    let data = JSON.parse(localStorage.getItem("laporan")) || [];
+    if(data.length === 0){
+      document.getElementById("daftarLaporan").innerHTML = "Belum ada laporan";
+      return;
+    }
+    let html = "";
+    data.forEach((laporan, i) => {
+      html += `
+        <div class="card">
+          <b>Laporan #${i+1}</b><br>
+          <b>Nama:</b> ${laporan.nama}<br>
+          <b>Alamat:</b> ${laporan.alamat}<br>
+          <b>Pekerjaan:</b> ${laporan.pekerjaan}<br>
+          <b>NIK/NIM:</b> ${laporan.nik}<br>
+          <b>Isi:</b> ${laporan.isi}<br>
+          <b>Status:</b> <span style="color:${laporan.status==='Selesai'?'green':laporan.status==='Diproses'?'blue':'orange'}">${laporan.status}</span><br>
+          <small><i>${laporan.tanggal}</i></small><br><br>
+          <button onclick="ubahStatus(${i}, 'Diproses')">Diproses</button>
+          <button onclick="ubahStatus(${i}, 'Selesai')">Selesai</button>
+          <button onclick="hapusLaporan(${i})" style="background:red;color:white">Hapus</button>
+        </div>`;
+    });
+    document.getElementById("daftarLaporan").innerHTML = html;
+  }
+
+  function ubahStatus(index, status){
+    let data = JSON.parse(localStorage.getItem("laporan")) || [];
+    data[index].status = status;
+    localStorage.setItem("laporan", JSON.stringify(data));
+    tampilkanLaporan();
+  }
+
+  function hapusLaporan(index){
+    let data = JSON.parse(localStorage.getItem("laporan")) || [];
+    if(confirm("Yakin ingin menghapus laporan ini?")){
+      data.splice(index,1);
+      localStorage.setItem("laporan", JSON.stringify(data));
+      tampilkanLaporan();
+    }
+  }
+
+  tampilkanLaporan();
+</script>
+</body>
+</html>
